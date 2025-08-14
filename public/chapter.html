@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Reading Chapter</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      background: #121212;
+      color: #ddd;
+      font-family: Georgia, serif;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: #1e1e1e;
+      padding: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #ff4b4b;
+    }
+    .btn {
+      background: #ff4b4b;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.3s;
+      text-decoration: none;
+    }
+    .btn:hover {
+      background: #e63c3c;
+    }
+    .content {
+      max-width: 800px;
+      margin: auto;
+      padding: 20px;
+      line-height: 1.8;
+      font-size: 1.1em;
+    }
+    .nav-buttons {
+      display: flex;
+      justify-content: space-between;
+      padding: 20px;
+      border-top: 1px solid #333;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <button class="btn" onclick="goBack()">⬅ Back</button>
+    <h2 id="chapterTitle">Chapter</h2>
+  </header>
+  
+  <div class="content" id="chapterContent">Loading...</div>
+  
+  <div class="nav-buttons">
+    <button class="btn" id="prevBtn">⬅ Previous</button>
+    <button class="btn" id="nextBtn">Next ➡</button>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const novel = urlParams.get('novel');
+    let index = parseInt(urlParams.get('index'));
+
+    function goBack() {
+      window.location.href = `${novel}.html`;
+    }
+
+    fetch(`/api/chapters/${novel}`)
+      .then(res => res.json())
+      .then(chapters => {
+        document.getElementById('chapterTitle').innerText = chapters[index].replace('.md', '');
+        fetch(`/novels/${novel}/${chapters[index]}`)
+          .then(res => res.text())
+          .then(text => {
+            document.getElementById('chapterContent').innerText = text;
+          });
+
+        document.getElementById('prevBtn').onclick = () => {
+          if (index > 0) window.location.href = `chapter.html?novel=${novel}&index=${index - 1}`;
+        };
+        document.getElementById('nextBtn').onclick = () => {
+          if (index < chapters.length - 1) window.location.href = `chapter.html?novel=${novel}&index=${index + 1}`;
+        };
+      });
+  </script>
+</body>
+</html>

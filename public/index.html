@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>My Novel Library</title>
+  <style>
+    body { background: #121212; color: white; font-family: sans-serif; padding: 20px; }
+    .novel-card { display: inline-block; text-align: center; background: #1e1e1e; padding: 10px; border-radius: 10px; width: 200px; margin: 10px; }
+    .novel-card img { width: 100%; border-radius: 8px; }
+    .read-now-btn { display: inline-block; margin-top: 8px; padding: 8px 14px; background: #ff4b4b; color: white; text-decoration: none; border-radius: 6px; cursor: pointer; }
+    .read-now-btn:hover { background: #e63c3c; }
+    #reader { max-width: 700px; margin-top: 40px; }
+    #chapter-nav { margin-top: 20px; display: flex; justify-content: space-between; }
+    button { padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer; background: #ff4b4b; color: white; }
+    button:hover { background: #e63c3c; }
+  </style>
+</head>
+<body>
+
+  <h1>📚 My Novel Library</h1>
+  <div id="novel-grid"></div>
+
+  <div id="reader" style="display:none;">
+    <h2 id="chapter-title"></h2>
+    <div id="chapter-content" style="white-space: pre-wrap; line-height: 1.6;"></div>
+    <div id="chapter-nav">
+      <button id="prev-chap">Prev Chapter</button>
+      <button id="next-chap">Next Chapter</button>
+    </div>
+  </div>
+
+<script>
+const novels = [
+  { folder: "the-secret-mrs", title: "The Secret Mrs" }
+];
+
+const grid = document.getElementById("novel-grid");
+novels.forEach(novel => {
+  const card = document.createElement("div");
+  card.className = "novel-card";
+  card.innerHTML = `
+    <img src="covers/${novel.folder}.jpg" alt="${novel.title}">
+    <h2>${novel.title}</h2>
+    <div class="read-now-btn">Read Now</div>
+  `;
+  card.querySelector(".read-now-btn").addEventListener("click", () => loadNovel(novel.folder));
+  grid.appendChild(card);
+});
+
+let chapters = [];
+let currentIndex = 0;
+
+function loadNovel(folder) {
+  fetch(`novels/${folder}/index.json`)
+    .then(res => res.json())
+    .then(data => {
+      chapters = data;
+      currentIndex = 0;
+      grid.style.display = "none";
+      document.getElementById("reader").style.display = "block";
+      loadChapter(folder, currentIndex);
+    })
+    .catch(err => console.error("Cannot load chapters:", err));
+}
+
+function loadChapter(folder, index) {
+  const chapterFile = chapters[index];
+  fetch(`novels/${folder}/${chapterFile}`)
+    .then(res => res.text())
+    .then(md => {
+      document.getElementById("chapter-title").textContent = chapterFile.replace(".md","").replace(/-/g,' ');
+      document.getElementById("chapter-content").textContent = md;
+    });
+}
+
+document.getElementById("prev-chap").addEventListener("click", () => {
+  if(currentIndex > 0) {
+    currentIndex--;
+    loadChapter(novels[0].folder, currentIndex);
+  }
+});
+
+document.getElementById("next-chap").addEventListener("click", () => {
+  if(currentIndex < chapters.length -1) {
+    currentIndex++;
+    loadChapter(novels[0].folder, currentIndex);
+  }
+});
+</script>
+
+</body>
+</html>
+<!-- index.html -->
+<div class="novel-card">
+    <div class="badge">FULL</div>
+    <img src="covers/the-secret-mrs.jpg" alt="The Secret Mrs">
+    <div class="novel-title">The Secret Mrs</div>
+</div>
+  

@@ -1,0 +1,63 @@
+let chapters = [];
+let currentChapterIndex = -1;
+
+const chapterListEl = document.getElementById('chapter-list');
+const chapterContentEl = document.getElementById('chapter-content');
+const tocEl = document.getElementById('toc');
+const tocBtn = document.getElementById('toc-btn');
+
+const prevBtn = document.getElementById('prev-btn');
+const nextBtn = document.getElementById('next-btn');
+
+// Toggle Table of Contents
+tocBtn.addEventListener('click', () => {
+    tocEl.classList.toggle('hidden');
+});
+
+// Load chapters list
+fetch('/api/chapters/the-secret-mrs')
+    .then(res => res.json())
+    .then(data => {
+        chapters = data;
+        chapterListEl.innerHTML = "";
+        data.forEach((chapter, index) => {
+            const li = document.createElement('li');
+            li.textContent = chapter.replace('.md', '');
+            li.addEventListener('click', () => loadChapter(index));
+            chapterListEl.appendChild(li);
+        });
+    })
+    .catch(err => {
+        console.error(err);
+        chapterListEl.innerHTML = "<li>Error loading chapters</li>";
+    });
+
+// Load chapter content
+function loadChapter(index) {
+    if (index < 0 || index >= chapters.length) return;
+    currentChapterIndex = index;
+
+    fetch(`/novels/the-secret-mrs/${chapters[index]}`)
+        .then(res => res.text())
+        .then(text => {
+            chapterContentEl.innerHTML = `<h2>${chapters[index].replace('.md', '')}</h2><pre>${text}</pre>`;
+            updateNavButtons();
+        });
+
+    tocEl.classList.add('hidden'); // hide toc after selecting
+}
+
+// Update prev/next buttons
+function updateNavButtons() {
+    prevBtn.disabled = currentChapterIndex <= 0;
+    nextBtn.disabled = currentChapterIndex >= chapters.length - 1;
+}
+
+// Navigation events
+prevBtn.addEventListener('click', () => {
+    if (currentChapterIndex > 0) loadChapter(currentChapterIndex - 1);
+});
+
+nextBtn.addEventListener('click', () => {
+    if (currentChapterIndex < chapters.length - 1) loadChapter(currentChapterIndex + 1);
+});

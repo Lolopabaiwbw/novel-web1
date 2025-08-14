@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Chapters</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="dark">
+  <header class="site-header">
+    <button id="back-home" class="btn">← Home</button>
+    <div>
+      <button id="theme-toggle" class="btn small">Toggle Theme</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section id="novel-info">
+      <img id="cover-img" src="" alt="cover" class="cover" onerror="this.style.display='none'">
+      <h2 id="novel-title">Novel</h2>
+      <p id="novel-desc" class="muted">Auto-loaded chapters appear below.</p>
+    </section>
+
+    <section id="chapter-list" class="chapter-list"></section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
